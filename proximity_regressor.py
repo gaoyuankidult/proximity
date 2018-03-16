@@ -1,10 +1,7 @@
 import keras
 import numpy as np
 import matplotlib
-#matplotlib.use('wx')
-
 import matplotlib.pyplot as plt
-
 
 from sklearn.neighbors.kde import KernelDensity
 from scipy.stats import norm
@@ -16,7 +13,6 @@ data = np.load("proximity_data.npy")
 data = data[data[:,1]!=3]
 data = data[data[:,1]!=4]
 data = np.delete(data, -1, 1)  #remove the last column of dataset
-
 
 # read user information
 import csv
@@ -173,29 +169,17 @@ for user in UIDs:
 
 import random
 random.shuffle(preprocessed_set)
-
-print len(preprocessed_set)
-
 dataset = None
 for i in xrange(len(preprocessed_set)):
     if i == 0:
         dataset = preprocessed_set[i]
-        print dataset.shape
     else:
         dataset = np.concatenate((dataset, preprocessed_set[i]), axis=0)
 
-print dataset.shape
-
 dataset = dataset.reshape(dataset.shape[0], dataset.shape[1])
-
-
 original_dataset = deepcopy(dataset)
-
-#np.random.shuffle(dataset)
-
 test_percentage = 0.1
 test_num = int(round(dataset.shape[0]*test_percentage))
-
 
 features = 10
 X = dataset[:-test_num,0:features]
@@ -224,19 +208,13 @@ drate = 0
 from cwrnn import ClockworkRNN
 
 model = Sequential()
-#model.add(ClockworkRNN(hidden_neurons,input_shape=(in_out_neurons,1),period_spec = [1.]))
 model.add(GRU(hidden_neurons,input_shape=(in_out_neurons,1)))
-#model.add(LSTM(hidden_neurons, return_sequences=False))
-#model.add(Dense(hidden_neurons, input_dim=in_out_neurons))
 model.add(Activation("relu"))
 
 model.add(Dense(out_neurons))
 model.add(Activation("linear"))
 
-
 early_stopping=keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, verbose=1, mode='auto')
-
-
 model.compile(loss="mean_squared_error", optimizer='adam')  
 fit_X = X.reshape(X.shape[0], X.shape[1],1)
 fit_y = y.reshape(y.shape[0],1)
